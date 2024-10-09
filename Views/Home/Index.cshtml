@@ -45,10 +45,10 @@
         initMap();
     });
     function initMap() {
-        const directionsService = new google.maps.DirectionsService();
-        const onButtonClick = function () {
-            Source = document.getElementById('input').value.toLowerCase();
-            Destination = document.getElementById('output').value.toLowerCase();
+        var directionsService = new google.maps.DirectionsService();
+        var onButtonClick = function () {
+            source = document.getElementById('input').value.toLowerCase();
+            destination = document.getElementById('output').value.toLowerCase();
             if (
                 source !== null &&
                 source !== '' &&
