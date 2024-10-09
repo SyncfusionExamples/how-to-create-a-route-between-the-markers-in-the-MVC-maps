@@ -84,16 +84,16 @@
                     latitude: response.routes[0].legs[0].end_location.lat(),
                     longitude: response.routes[0].legs[0].end_location.lng(),
                 });
-                var navigationlines = maps.ej2_instances[0].layers[0].navigationLineSettings;
-                var latLngs = response.routes[0].overview_path;
+                var navigationLines = maps.ej2_instances[0].layers[0].navigationLineSettings;
+                var coordinates = response.routes[0].overview_path;
                 var latitudes = [];
                 var longitudes = [];
-                for (var i = 0; i < latLngs.length; i++) {
-                    latitudes.push(latLngs[i].lat());
-                    longitudes.push(latLngs[i].lng());
+                for (var i = 0; i < coordinates.length; i++) {
+                    latitudes.push(coordinates[i].lat());
+                    longitudes.push(coordinates[i].lng());
                 }
-                navigationlines[0].latitude = latitudes;
-                navigationlines[0].longitude = longitudes;
+                navigationLines[0].latitude = latitudes;
+                navigationLines[0].longitude = longitudes;
             })
             .catch((e) => window.alert('Directions request failed due to ' + status));
     }
