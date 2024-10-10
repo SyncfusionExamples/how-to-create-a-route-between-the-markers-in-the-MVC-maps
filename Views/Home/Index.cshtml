@@ -1,0 +1,100 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+@using Syncfusion.EJ2
+@using Syncfusion.EJ2.Maps
+
+
+<div>
+    <label for="textInput">Source: </label>
+    <input type="text" id="input" name="textInput" /><br /><br />
+
+    <label for="textOutput">Destination: </label>
+    <input type="text" id="output" name="textOutput" /><br /><br />
+
+    <button id="route">Add Route</button>
+</div>
+
+<div>
+    @Html.EJS().Maps("maps").ZoomSettings(zoom=>zoom.Enable(true)).Layers(layer =>
+    {
+    layer.UrlTemplate("http://a.tile.openstreetmap.org/level/tileX/tileY.png").MarkerSettings(marker =>
+    {
+    marker.Visible(true)
+    .Width(20)
+    .Height(20)
+    .Shape(MarkerType.Image)
+    .ImageUrl("https://ej2.syncfusion.com/aspnetmvc/Content/Maps/ballon.png")
+    .Add();
+    }).NavigationLineSettings(ns =>
+    {
+    ns.Visible(true)
+    .Color("black")
+    .Angle(0)
+    .Width(2)
+    .Add();
+    }).Add();
+    }).Render()
+</div>
+
+<script>
+    var source;
+    var destination;
+    document.addEventListener('DOMContentLoaded', function () {
+        initMap();
+    });
+    function initMap() {
+        var directionsService = new google.maps.DirectionsService();
+        var onButtonClick = function () {
+            source = document.getElementById('input').value.toLowerCase();
+            destination = document.getElementById('output').value.toLowerCase();
+            if (
+                source !== null &&
+                source !== '' &&
+                destination !== null &&
+                destination !== ''
+            ) {
+                calculateAndDisplayRoute(directionsService);
+            }
+        };
+        document.getElementById('route').addEventListener('click', onButtonClick);
+    }
+
+    function calculateAndDisplayRoute(directionsService) {
+        directionsService
+            .route({
+                origin: {
+                    query: source,
+                },
+                destination: {
+                    query: destination,
+                },
+                travelMode: google.maps.TravelMode.DRIVING,
+            })
+            .then((response) => {
+                maps.ej2_instances[0].zoomSettings.shouldZoomInitially = true;
+                var markers = maps.ej2_instances[0].layers[0].markerSettings;
+                markers[0].dataSource = [];
+                markers[0].dataSource.push({
+                    latitude: response.routes[0].legs[0].start_location.lat(),
+                    longitude: response.routes[0].legs[0].start_location.lng(),
+                });
+                markers[0].dataSource.push({
+                    latitude: response.routes[0].legs[0].end_location.lat(),
+                    longitude: response.routes[0].legs[0].end_location.lng(),
+                });
+                var navigationLines = maps.ej2_instances[0].layers[0].navigationLineSettings;
+                var coordinates = response.routes[0].overview_path;
+                var latitudes = [];
+                var longitudes = [];
+                for (var i = 0; i < coordinates.length; i++) {
+                    latitudes.push(coordinates[i].lat());
+                    longitudes.push(coordinates[i].lng());
+                }
+                navigationLines[0].latitude = latitudes;
+                navigationLines[0].longitude = longitudes;
+            })
+            .catch((e) => window.alert('Directions request failed due to ' + status));
+    }
+</script>
